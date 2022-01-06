@@ -41,9 +41,9 @@ function dual_colorize(subtitles, selected_lines, active_line)
 
 	for z, i in ipairs(selected_lines) do
 		-- idk why, just copy & modify till works
-		local l = subtitles[i]
-		local m = subtitles[i]
-		m.text = ""
+		local input = subtitles[i]
+		local output = subtitles[i]
+		output.text = ""
 
 		local colorFlag = 0 -- mark for colors
 		local braceFlag = 0 -- mark for braces: 1 when within brace 
@@ -58,32 +58,32 @@ function dual_colorize(subtitles, selected_lines, active_line)
 			 - Yes(1): 	keep it, and do nothing until find its ending
 				
 		]]
-		for char in unicode.chars(l.text) do -- aegisub.unicode, for each character
+		for character in unicode.chars(input.text) do -- aegisub.unicode, for each character
 			if braceFlag == 0 then
 				-- not within a pair of brace
-				if char ~= '{' then
+				if character ~= '{' then
 					-- do!
 					-- if bg required, add \\4cH954F4D for background
 					if colorFlag == 0 then
-						m.text = m.text .. "{\\c&HD6C7F3&}" .. char -- pink
+						output.text = output.text .. "{\\c&HD6C7F3&}" .. character -- pink
 						colorFlag = 1
 					else
-						m.text = m.text .. "{\\c&HFBE0D3&}" .. char -- blue
+						output.text = output.text .. "{\\c&HFBE0D3&}" .. character -- blue
 						colorFlag = 0
 					end -- end if colorFlag == 0
 				else
-					m.text = m.text .. char
+					output.text = output.text .. character
 					braceFlag = 1
-				end -- end if char ~= '{'
+				end -- end if character ~= '{'
 			else
 				-- within a pair of brace
-				m.text = m.text .. char
-				if char == '}' then
+				output.text = output.text .. character
+				if character == '}' then
 					braceFlag = 0
-				end -- end if char == '}'
+				end -- end if character == '}'
 			end -- end if braceFlag == 0
 		end -- end for
-		subtitles[i] = m -- return to subtitles
+		subtitles[i] = output -- return to subtitles
 	end -- end for
 	aegisub.set_undo_point(script_name) -- allow undo (I guess...)
 end -- end func
