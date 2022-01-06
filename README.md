@@ -22,15 +22,19 @@
     
     在aegisub中选定行，点击自动化->Dual Colorize
     
-4.  If you want to change colors, modify line 44 and 47
+4.  If you want to change colors, modify lines 68 and 71
 
-    如果想要更改颜色，请修改第44行和第47行
+    如果想要更改颜色，请修改第68行和第71行
 
 ## Notes
 
-Try to use this for the first time, or try to improve my codes
+Support brace pairs determination now, but problems occur when single brace appear
 
-请尽可能在开始的时候使用，或者也可以帮我改代码hhh
+目前已支持成对大括号判定，但单个大括号会导致问题
+
+Todo: slash determination (\h, \n, \N)
+
+Todo：斜杠判定（\h、\n、\N）
 
 ## BUGs?
 

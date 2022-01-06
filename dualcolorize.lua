@@ -19,7 +19,7 @@ as the name is changed.
 ]]
 
 -- 照葫芦画瓢，出什么BUG都不意外
--- copy & paste, BUG contributor
+-- copy & paste makes BUG contributor
 
 local tr = aegisub.gettext -- idk the meaning, just copy...
 
@@ -27,7 +27,7 @@ local tr = aegisub.gettext -- idk the meaning, just copy...
 script_name = tr"Dual Colorize"
 script_description = tr"Dual colorize subtitles"
 script_author = "U5ER-N4ME"
-script_version = "0.1"
+script_version = "0.2"
 
 -- use aegisub.unicode. see: https://aegi.vmoe.info/docs/3.2/Automation/Lua/Modules/unicode/
 unicode = require 'aegisub.unicode'
@@ -45,24 +45,43 @@ function dual_colorize(subtitles, selected_lines, active_line)
 		local m = subtitles[i]
 		m.text = ""
 
+		local colorFlag = 0 -- mark for colors
+		local braceFlag = 0 -- mark for braces: 1 when within brace 
+							-- (since only one pair of brace can be accepted in aegisub, nested condition is not considered)
+
 		--[[
-		for j = 1, string.len(l.text), 6 do
-			m.text = m.text .. "{\\c&HFFCC66&}" .. string.sub(l.text, j, j+2)
-			m.text = m.text .. "{\\c&H0000FF&}" .. string.sub(l.text, j+3, j+5)
-		end -- end for
-		]] -- abandoned
-
-		local flag = 0 -- mark for colors
-
+			Procedure: 
+			within brace ? 
+			 - No(0):	Is this a brace ? 
+						 - No:  do! 
+						 - Yes: flag... and keep it
+			 - Yes(1): 	keep it, and do nothing until find its ending
+				
+		]]
 		for char in unicode.chars(l.text) do -- aegisub.unicode, for each character
-			-- if bg required, add \\4cH954F4D
-			if flag == 0 then
-				m.text = m.text .. "{\\c&HD6C7F3&}" .. char -- pink
-				flag = 1
+			if braceFlag == 0 then
+				-- not within a pair of brace
+				if char ~= '{' then
+					-- do!
+					-- if bg required, add \\4cH954F4D for background
+					if colorFlag == 0 then
+						m.text = m.text .. "{\\c&HD6C7F3&}" .. char -- pink
+						colorFlag = 1
+					else
+						m.text = m.text .. "{\\c&HFBE0D3&}" .. char -- blue
+						colorFlag = 0
+					end -- end if colorFlag == 0
+				else
+					m.text = m.text .. char
+					braceFlag = 1
+				end -- end if char ~= '{'
 			else
-				m.text = m.text .. "{\\c&HFBE0D3&}" .. char -- blue
-				flag = 0
-			end -- end if
+				-- within a pair of brace
+				m.text = m.text .. char
+				if char == '}' then
+					braceFlag = 0
+				end -- end if char == '}'
+			end -- end if braceFlag == 0
 		end -- end for
 		subtitles[i] = m -- return to subtitles
 	end -- end for
